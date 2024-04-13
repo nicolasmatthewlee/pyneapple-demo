@@ -7,8 +7,6 @@
 docker build -t pyneapple-demo .
 ```
 
-_NOTE: image must be rebuilt if a new package is installed_
-
 2. start container
 
 ```shell
