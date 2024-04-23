@@ -5,7 +5,9 @@ const ButtonContainerHorizontal = ({ buttons }: { buttons: ReactNode[] }) => {
   return (
     <div className="w-full flex justify-center space-x-[15px]">
       {buttons.map((button, key) => (
-        <div key={key}>{button}</div>
+        <div className="pointer-events-auto" key={key}>
+          {button}
+        </div>
       ))}
     </div>
   );

@@ -48,7 +48,7 @@ const Button = ({
       )}
       <button
         className={
-          "shadow-sm bg-white px-[15px] py-[5px] rounded-sm hover:bg-gray-100 font-medium" +
+          "ring-black ring-[2px] ring-opacity-20 shadow-sm bg-white px-[10px] py-[3px] rounded-sm hover:bg-gray-100 font-medium text-[15px]" +
           " " +
           (showPopup ? buttonOnShowPopupStyles : "")
         }

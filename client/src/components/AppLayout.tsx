@@ -4,8 +4,10 @@ import Navigation from "./navigation/Navigation";
 const AppLayout = ({ content }: { content?: ReactNode }) => {
   return (
     <div className="flex flex-col h-screen">
-      <Navigation />
-      <div className="p-[15px] h-full w-full">{content}</div>
+      <div className="z-10">
+        <Navigation />
+      </div>
+      <div className="h-full w-full z-0">{content}</div>
     </div>
   );
 };
