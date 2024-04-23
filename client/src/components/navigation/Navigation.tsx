@@ -4,9 +4,9 @@ import PYNEAPPLE_ICON from "assets/pyneapple-icon.png";
 
 const Navigation = () => {
   return (
-    <div className="shadow-sm flex">
+    <div className="shadow-lg flex items-center">
       {/* logo */}
-      <div className="flex flex-none px-[15px] space-x-[10px]">
+      <div className="flex flex-none px-[20px] space-x-[10px]">
         <img
           className="flex-none py-[10px] h-[55px]"
           src={PYNEAPPLE_ICON}

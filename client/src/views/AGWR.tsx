@@ -1,25 +1,7 @@
 import AppLayout from "components/AppLayout";
 import ButtonContainerHorizontal from "components/ButtonContainerHorizontal";
 import Button from "components/Button";
-
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
-
-const Map = () => {
-  return (
-    <MapContainer
-      center={[51.505, -0.09]}
-      zoom={13}
-      scrollWheelZoom={false}
-      style={{ width: "100%", height: "100%" }}
-      attributionControl={false}
-    >
-      <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
-      {/* <Marker position={[51.505, -0.09]}>
-        <Popup>Example popup</Popup>
-      </Marker> */}
-    </MapContainer>
-  );
-};
+import Map from "components/map/Map";
 
 const Content = () => {
   return (

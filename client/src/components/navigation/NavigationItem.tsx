@@ -18,7 +18,7 @@ const NavigationItem = ({
     return (
       <div
         className={
-          "p-[15px] hover:bg-gray-100 truncate font-medium select-none h-full"
+          "px-[20px] py-[20px] hover:bg-gray-100 truncate font-medium select-none h-full rounded-sm"
         }
       >
         {label}
@@ -53,7 +53,7 @@ const NavigationItem = ({
           {items.map((item, key) => (
             <Link
               to={item.url}
-              className="bg-white hover:bg-gray-100 px-[15px] py-[5px]"
+              className="bg-white hover:bg-gray-100 px-[15px] py-[5px] last-of-type:rounded-b-sm"
               key={key}
             >
               {item.label}

@@ -14,7 +14,7 @@ docker build -t pyneapple-demo .
 docker run -v ./client:/home/client --publish 3000:3000 -it pyneapple-demo sh
 ```
 
-3. install packages (if needed) and run client
+3. run client
 
 ```shell
 # in home/
