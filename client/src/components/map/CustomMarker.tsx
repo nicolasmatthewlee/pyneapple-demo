@@ -1,8 +1,10 @@
 import { Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import { ViewType } from "views/AGWR";
 
 const CustomMarker = ({
   data,
+  viewType,
 }: {
   data: {
     latitude: number;
@@ -11,11 +13,25 @@ const CustomMarker = ({
     predicted: number;
     generated: number;
   };
+  viewType: ViewType;
 }) => {
-  // NOTE : will want iconColor to change based on view type
-  const iconColor = (data.actual / 100) * 255;
+  let iconColor: string = "";
+  switch (viewType) {
+    case "residuals":
+      iconColor = `rgba(${
+        ((data.actual - data.predicted) / data.actual) * 255
+      },0,50,0.5)`;
+      break;
+    case "bandwidths":
+      iconColor = `rgba(0,150,50,0.5)`;
+      break;
+    case "correlations":
+      iconColor = `rgba(0,50,150,0.5)`;
+      break;
+  }
+
   const MapIcon = new L.DivIcon({
-    html: `<div style="background-color:rgba(${iconColor},0,50,0.5); width: 15px; height: 15px; border: 1.5px solid rgba(255,255,255,1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;"></div>`,
+    html: `<div style="background-color:${iconColor}; width: 15px; height: 15px; border: 1.5px solid rgba(255,255,255,1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;"></div>`,
     className: "", // do not inherit default styles
     iconSize: [18, 18],
     iconAnchor: [9, 9],
@@ -37,12 +53,13 @@ const CustomMarker = ({
       <Popup className="">
         <div className="right-[27px] bg-white absolute bottom-[-4.5px] shadow truncate p-[5px] flex flex-col items-end font-sans font-medium rounded-sm">
           {[
-            { label: "Actual", value: data.actual },
-            { label: "Predicted", value: data.predicted },
-            { label: "Generated", value: data.generated },
+            { label: "Actual", value: data.actual.toLocaleString() },
+            { label: "Predicted", value: data.predicted.toLocaleString() },
+            { label: "Generated", value: data.generated.toLocaleString() },
           ].map((item) => (
             <div>
-              <span className="text-gray-500">{item.label}</span> ${item.value}
+              <span className="text-gray-500 font-normal">{item.label}</span> $
+              {item.value}
             </div>
           ))}
         </div>

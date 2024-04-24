@@ -1,12 +1,14 @@
 import { ReactNode, useState } from "react";
 
-const Button = ({
+const DatasetButton = ({
   label,
+  displayValue,
   onClick = () => {},
   popupContent = null,
   popupAnchor = "BL",
 }: {
   label: ReactNode;
+  displayValue: string;
   onClick?: Function;
   popupContent?: ReactNode;
   popupAnchor?: "BL" | "BR" | "TL" | "TR"; // specifies which corner of button to anchor the popup at
@@ -58,9 +60,12 @@ const Button = ({
         }}
       >
         {label}
+        <span className="text-gray-500 pl-[5px] font-normal">
+          {displayValue}
+        </span>
       </button>
     </div>
   );
 };
 
-export default Button;
+export default DatasetButton;
