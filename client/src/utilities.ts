@@ -76,10 +76,11 @@ export const getBandwidthColoring = (
     .sort((a, b) => a.distance - b.distance)
     .map((p, i) => {
       if (i > bandwidth) return p;
-      const intensity = 150 + (255 - 150) * gaussian(p.distance);
+      const lightness = 150 + (255 - 150) * gaussian(p.distance);
+      const darkness = 150 - (255 - 150) * gaussian(p.distance);
       return {
         ...p,
-        color: `rgba(${intensity},150,150,0.5)`,
+        color: `rgba(${lightness},${darkness},${darkness},0.5)`,
       };
     });
 };
