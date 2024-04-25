@@ -1,10 +1,9 @@
 import { Marker, Popup } from "react-leaflet";
 import L from "leaflet";
-import { ViewType } from "views/AGWR";
 
 const CustomMarker = ({
   data,
-  viewType,
+  onClick = () => {},
 }: {
   data: {
     latitude: number;
@@ -12,23 +11,12 @@ const CustomMarker = ({
     actual: number;
     predicted: number;
     generated: number;
+    color?: string;
   };
-  viewType: ViewType;
+  onClick?: Function;
 }) => {
-  let iconColor: string = "";
-  switch (viewType) {
-    case "residuals":
-      iconColor = `rgba(${
-        ((data.actual - data.predicted) / data.actual) * 255
-      },0,50,0.5)`;
-      break;
-    case "bandwidths":
-      iconColor = `rgba(0,150,50,0.5)`;
-      break;
-    case "correlations":
-      iconColor = `rgba(0,50,150,0.5)`;
-      break;
-  }
+  let iconColor = `rgba(150,150,150,0.5)`;
+  if (data.color) iconColor = data.color;
 
   const MapIcon = new L.DivIcon({
     html: `<div style="background-color:${iconColor}; width: 15px; height: 15px; border: 1.5px solid rgba(255,255,255,1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;"></div>`,
@@ -48,6 +36,9 @@ const CustomMarker = ({
         mouseout: (e) => {
           e.target.closePopup();
         },
+        click: (e) => {
+          onClick(e);
+        },
       }}
     >
       <Popup className="">
@@ -56,8 +47,8 @@ const CustomMarker = ({
             { label: "Actual", value: data.actual.toLocaleString() },
             { label: "Predicted", value: data.predicted.toLocaleString() },
             { label: "Generated", value: data.generated.toLocaleString() },
-          ].map((item) => (
-            <div>
+          ].map((item, i) => (
+            <div key={i}>
               <span className="text-gray-500 font-normal">{item.label}</span> $
               {item.value}
             </div>

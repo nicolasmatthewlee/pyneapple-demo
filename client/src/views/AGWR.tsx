@@ -4,38 +4,9 @@ import Button from "components/button/Button";
 import DatasetButton from "components/button/DatasetButton";
 import Map from "components/map/Map";
 import { useState } from "react";
-
-import NEW_YORK_AIRBNB_DATA from "data/New_York_Airbnb";
-import KING_COUNTY_HOUSES_DATA from "data/King_County_Houses";
+import { NewYorkDataset, KingCountyDataset, Dataset } from "data/data";
 
 export type ViewType = "residuals" | "correlations" | "bandwidths";
-
-export type Dataset = {
-  name: string;
-  center: [number, number];
-  zoom: number;
-  data: {
-    latitude: number;
-    longitude: number;
-    actual: number;
-    predicted: number;
-    generated: number;
-  }[];
-};
-
-const NewYorkDataset: Dataset = {
-  name: "New_York_Airbnb",
-  center: [40.72894888066264, -73.95216961468454],
-  zoom: 12,
-  data: NEW_YORK_AIRBNB_DATA,
-};
-
-const KingCountyDataset: Dataset = {
-  name: "King_County_Houses",
-  center: [47.56005251931708, -122.21389640494147],
-  zoom: 10,
-  data: KING_COUNTY_HOUSES_DATA,
-};
 
 const Content = () => {
   const [dataset, setDataset] = useState<Dataset>(NewYorkDataset);
@@ -60,7 +31,7 @@ const Content = () => {
               displayValue={dataset.name}
               popupAnchor="BR"
               onClick={() => {
-                if (dataset.name == "King_County_Houses")
+                if (dataset.name === "King_County_Houses")
                   setDataset(NewYorkDataset);
                 else setDataset(KingCountyDataset);
               }}
