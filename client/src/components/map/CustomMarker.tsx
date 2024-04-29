@@ -10,7 +10,6 @@ const CustomMarker = ({
     longitude: number;
     actual: number;
     predicted: number;
-    generated: number;
     color?: string;
   };
   onClick?: Function;
@@ -46,7 +45,6 @@ const CustomMarker = ({
           {[
             { label: "Actual", value: data.actual.toLocaleString() },
             { label: "Predicted", value: data.predicted.toLocaleString() },
-            { label: "Generated", value: data.generated.toLocaleString() },
           ].map((item, i) => (
             <div key={i}>
               <span className="text-gray-500 font-normal">{item.label}</span> $

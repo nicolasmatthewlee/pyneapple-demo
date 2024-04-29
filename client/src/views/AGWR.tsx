@@ -1,7 +1,6 @@
 import AppLayout from "components/AppLayout";
 import ButtonContainerHorizontal from "components/button/ButtonContainerHorizontal";
 import Button from "components/button/Button";
-import DatasetButton from "components/button/DatasetButton";
 import Map from "components/map/Map";
 import { useState } from "react";
 import { NewYorkDataset, KingCountyDataset, Dataset } from "data/data";
@@ -26,20 +25,18 @@ const Content = () => {
       <div className="py-[15px] absolute z-10 w-full top-0 pointer-events-none">
         <ButtonContainerHorizontal
           buttons={[
-            <DatasetButton
+            <Button
               label="Dataset"
               displayValue={dataset.name}
-              popupAnchor="BR"
               onClick={() => {
                 if (dataset.name === "King_County_Houses")
                   setDataset(NewYorkDataset);
                 else setDataset(KingCountyDataset);
               }}
             />,
-            <DatasetButton
+            <Button
               label="Models"
               displayValue={models.spatial + " / " + models.ml}
-              popupAnchor="BR"
             />,
           ]}
         />
@@ -61,18 +58,6 @@ const Content = () => {
               label="Bandwidths"
               isSelected={viewType === "bandwidths"}
               onClick={() => setViewType("bandwidths")}
-            />,
-            <Button
-              label="Generate"
-              popupAnchor="TL"
-              popupContent={
-                <div className="w-[250px] h-[250px] p-[15px]">
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat."
-                </div>
-              }
             />,
           ]}
         />
