@@ -2,7 +2,11 @@ import { useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 import CustomMarker from "components/map/CustomMarker";
 import { Dataset, Point } from "data/data";
-import { getBandwidthColoring, getResidualColoring } from "utilities";
+import {
+  getBandwidthColoring,
+  getResidualColoring,
+  getCorrelationColoring,
+} from "utilities";
 import { ViewType } from "views/AGWR";
 
 const Map = ({
@@ -21,6 +25,7 @@ const Map = ({
       data = getResidualColoring(dataset.data);
       break;
     case "correlations":
+      data = getCorrelationColoring(dataset.data);
       break;
     case "bandwidths":
       if (activePoint)

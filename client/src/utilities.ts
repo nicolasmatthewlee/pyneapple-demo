@@ -84,3 +84,23 @@ export const getBandwidthColoring = (
       };
     });
 };
+
+export const getCorrelationColoring = (allPoints: Point[]) => {
+  return allPoints.map((p) => {
+    // placeholder for now
+    const threshold = 400000;
+    let color = "";
+    if (p.actual > threshold) {
+      color = `rgba(150,150,${
+        150 + ((p.actual - threshold) / p.actual) * 105
+      },0.5)`;
+    } else
+      color = `rgba(${
+        150 + (-(p.actual - threshold) / p.actual) * 105
+      },150,150,0.5)`;
+    return {
+      ...p,
+      color,
+    };
+  });
+};
