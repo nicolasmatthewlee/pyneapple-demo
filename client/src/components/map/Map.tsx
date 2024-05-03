@@ -47,7 +47,8 @@ const Map = ({
       style={{ width: "100%", height: "100%" }}
       attributionControl={false}
     >
-      <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+      <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      {/* <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" /> */}
       {data.map((item, i) => {
         return (
           <CustomMarker
