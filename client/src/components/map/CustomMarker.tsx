@@ -11,6 +11,7 @@ const CustomMarker = ({
     actual: number;
     predicted: number;
     color?: string;
+    coefficients: number[];
   };
   onClick?: Function;
 }) => {
@@ -43,11 +44,41 @@ const CustomMarker = ({
       <Popup className="">
         <div className="right-[27px] bg-white absolute bottom-[-4.5px] shadow truncate p-[5px] flex flex-col items-end font-sans font-medium rounded-sm">
           {[
-            { label: "Actual", value: data.actual.toLocaleString() },
-            { label: "Predicted", value: data.predicted.toLocaleString() },
+            // {
+            //   label: "",
+            //   value: data.coefficients.map((e, i) => {
+            //     let num = e.toExponential(1).split("e");
+            //     let base = num[0];
+            //     let exponent = parseInt(num[1]);
+
+            //     return (
+            //       <span key={i}>
+            //         {base}•
+            //         {exponent !== 0 ? (
+            //           <>
+            //             10<sup>{exponent}</sup>
+            //           </>
+            //         ) : null}
+            //         x<sub>{i}</sub>
+            //         {i === data.coefficients.length - 1 ? (
+            //           ""
+            //         ) : (
+            //           <span className="text-gray-500 font-normal">{" + "}</span>
+            //         )}
+            //       </span>
+            //     );
+            //   }),
+            // },
+            { label: "Actual", value: "$" + data.actual.toLocaleString() },
+            {
+              label: "Predicted",
+              value: "$" + data.predicted.toLocaleString(),
+            },
           ].map((item, i) => (
             <div key={i}>
-              <span className="text-gray-500 font-normal">{item.label}</span> $
+              <span className="text-gray-500 font-normal mr-[4px]">
+                {item.label}
+              </span>
               {item.value}
             </div>
           ))}

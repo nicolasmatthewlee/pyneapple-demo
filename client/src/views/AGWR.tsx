@@ -5,7 +5,7 @@ import Map from "components/map/Map";
 import { useState } from "react";
 import { NewYorkDataset, KingCountyDataset, Dataset } from "data/data";
 
-export type ViewType = "residuals" | "correlations" | "bandwidths";
+export type ViewType = "residuals" | "coefficients" | "bandwidths";
 
 const Content = () => {
   const [dataset, setDataset] = useState<Dataset>(NewYorkDataset);
@@ -50,9 +50,9 @@ const Content = () => {
               onClick={() => setViewType("residuals")}
             />,
             <Button
-              label="Correlations"
-              isSelected={viewType === "correlations"}
-              onClick={() => setViewType("correlations")}
+              label="Coefficients"
+              isSelected={viewType === "coefficients"}
+              onClick={() => setViewType("coefficients")}
             />,
             <Button
               label="Bandwidths"

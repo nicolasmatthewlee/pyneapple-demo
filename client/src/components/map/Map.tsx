@@ -5,7 +5,7 @@ import { Dataset, Point } from "data/data";
 import {
   getBandwidthColoring,
   getResidualColoring,
-  getCorrelationColoring,
+  getCoefficientColoring,
 } from "utilities";
 import { ViewType } from "views/AGWR";
 
@@ -17,15 +17,20 @@ const Map = ({
   viewType: ViewType;
 }) => {
   const [activePoint, setActivePoint] = useState<Point | null>(null);
-  const bandwidth = 289; // hard-coding for now
+  const bandwidth = 300; // hard-coding for now
 
   let data: Point[] = dataset.data;
   switch (viewType) {
     case "residuals":
       data = getResidualColoring(dataset.data);
       break;
-    case "correlations":
-      data = getCorrelationColoring(dataset.data);
+    case "coefficients":
+      data = getCoefficientColoring(
+        dataset.data,
+        dataset.coefficientMins,
+        dataset.coefficientMeds,
+        dataset.coefficientMaxes
+      );
       break;
     case "bandwidths":
       if (activePoint)

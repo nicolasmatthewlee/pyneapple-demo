@@ -7,6 +7,7 @@ import utils as utils
 import time
 import math
 import multiprocessing
+import pickle
 
 kc_filename = "kc_house_sample.csv"
 ny_filename = "ny_airbnb_sample.csv"
@@ -19,12 +20,14 @@ except:
     raise Exception("You must choose an available dataset.")
 
 if selection == 1:
+    model_filename = "kc_model.pkl"
     prediction_filename = "kc_predictions.csv"
     df = pd.read_csv(kc_filename)
     x_train = df[["bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors"]].values
     y_train = df["price"].values.reshape(-1, 1)
     coords_train = df[["lat", "long"]].values
 elif selection == 2:
+    model_filename = "ny_model.pkl"
     prediction_filename = "ny_predictions.csv"
     df = pd.read_csv(ny_filename)
     x_train = df[
@@ -58,7 +61,7 @@ for rep in range(rep_count):
 
     # creating the A-GWR setting
     temp = len(x_train)
-    temp /= 900
+    temp /= 1092
     processes = min(multiprocessing.cpu_count(), math.ceil(temp))
     sec1 = max(1, math.floor(temp ** (0.5)))
     sec2 = max(1, math.ceil(temp ** (0.5)))
@@ -78,23 +81,20 @@ for rep in range(rep_count):
 
     end_time = time.time()
 
-    # predict and print result
-    # pred = A_GWR.predict(x_test, coords_test, y_test)
-    # test_r2 = utils.R2(y_test.reshape(-1).tolist(), pred)
-
-    # mean_time += end_time - start_time
-    # mean_res += test_r2
-    # print(rep, end_time - start_time, test_r2)
-
     # print bandwidths
     # NOTE: the first bandwidth is for the intercept
     print("bandwidths:", A_GWR.spatial_learners[0].bandwidths)
+
+    # save model
+    with open(model_filename, "wb") as file:
+        pickle.dump(A_GWR, file)
+        print(f'Model saved to "{model_filename}"')
 
     # save predictions to csv
     pred = A_GWR.predict(x_train, coords_train, y_train)
     df = pd.DataFrame(pred, columns=["predicted"])
     df.to_csv(prediction_filename, index=False)
-    print(f"Saved to `{prediction_filename}`")
+    print(f'Predictions saved to "{prediction_filename}"')
 
 
 print("\n", mean_time / rep_count, mean_res / rep_count)

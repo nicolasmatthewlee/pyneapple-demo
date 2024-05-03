@@ -45,7 +45,8 @@ export const getResidualColoring = (allPoints: Point[]) => {
   let min = Infinity;
   let max = -Infinity;
   let points = allPoints.map((p) => {
-    const residual = (p.actual - p.predicted) / p.actual;
+    let residual = 0;
+    if (p.actual !== 0) residual = (p.actual - p.predicted) / p.actual;
     min = Math.min(min, residual);
     max = Math.max(max, residual);
     return {
@@ -53,11 +54,26 @@ export const getResidualColoring = (allPoints: Point[]) => {
       residual: residual,
     };
   });
-  const colorScale = scaleDiverging(interpolateRdYlGn).domain([min, 0, max]);
-  return points.map((p) => ({
-    ...p,
-    color: convertColorToRGBA(colorScale(p.residual), 0.7),
-  }));
+
+  return points.map((p) => {
+    let percentOfMax = 0;
+    if (p.residual > 0) percentOfMax = p.residual / max;
+    else percentOfMax = p.residual / min;
+
+    const lightness = 150 + (255 - 150) * percentOfMax;
+    const darkness = 150 - (255 - 150) * percentOfMax;
+
+    let color = "";
+    console.log(min);
+    if (p.residual > 0)
+      color = `rgba(${darkness},${lightness},${darkness},0.5)`;
+    else color = `rgba(${lightness},${darkness},${darkness},0.5)`;
+
+    return {
+      ...p,
+      color: color,
+    };
+  });
 };
 
 export const getBandwidthColoring = (
@@ -85,19 +101,31 @@ export const getBandwidthColoring = (
     });
 };
 
-export const getCorrelationColoring = (allPoints: Point[]) => {
+export const getCoefficientColoring = (
+  allPoints: Point[],
+  coefficientMins: number[],
+  coefficientMeds: number[],
+  coefficientMaxes: number[]
+) => {
   return allPoints.map((p) => {
-    // placeholder for now
-    const threshold = 400000;
+    const i = 2; // placeholder for now
     let color = "";
-    if (p.actual > threshold) {
-      color = `rgba(150,150,${
-        150 + ((p.actual - threshold) / p.actual) * 105
-      },0.5)`;
-    } else
-      color = `rgba(${
-        150 + (-(p.actual - threshold) / p.actual) * 105
-      },150,150,0.5)`;
+
+    let percentOfMax = 0;
+    if (p.coefficients[i] > coefficientMeds[i]) {
+      const maxDiff = coefficientMaxes[i] - coefficientMeds[i];
+      percentOfMax = (p.coefficients[i] - coefficientMeds[i]) / maxDiff;
+    } else {
+      const maxDiff = coefficientMeds[i] - coefficientMins[i];
+      percentOfMax = Math.abs(p.coefficients[i] - coefficientMeds[i]) / maxDiff;
+    }
+
+    const lightness = 150 + (255 - 150) * Math.max(percentOfMax, 0);
+    const darkness = 150 - (255 - 150) * Math.max(percentOfMax, 0);
+
+    if (p.coefficients[i] > coefficientMeds[i]) {
+      color = `rgba(${lightness},${darkness},${lightness},0.5)`;
+    } else color = `rgba(${darkness},${lightness},${lightness},0.5)`;
     return {
       ...p,
       color,
