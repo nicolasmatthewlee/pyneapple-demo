@@ -6,7 +6,6 @@ export type Point = {
   longitude: number;
   actual: number;
   predicted: number;
-  generated: number;
 };
 
 export type Dataset = {
@@ -19,23 +18,30 @@ export type Dataset = {
 
 export const NewYorkDataset: Dataset = {
   name: "New_York_Airbnb",
-  center: [40.72894888066264, -73.95216961468454],
+  center: [40.84830495875344, -73.88455175068744],
   zoom: 12,
-  bandwidths: [],
+  bandwidths: [
+    { label: "intercept", value: 21 },
+    { label: "minimum_nights", value: 14 },
+    { label: "number_of_reviews", value: 116 },
+    { label: "reviews_per_month", value: 154 },
+    { label: "calculated_host_listings_count", value: 5 },
+    { label: "availability_365", value: 289 },
+  ],
   data: NEW_YORK_AIRBNB_DATA,
 };
 
 export const KingCountyDataset: Dataset = {
   name: "King_County_Houses",
-  center: [47.56005251931708, -122.21389640494147],
-  zoom: 10,
+  center: [47.61729305740989, -122.30174365821095],
+  zoom: 13,
   bandwidths: [
-    { label: "intercept", value: 300 },
-    { label: "bedrooms", value: 300 },
-    { label: "bathrooms", value: 300 },
-    { label: "sqft_living", value: 5 },
-    { label: "sqft_lot", value: 185 },
-    { label: "floors", value: 102 },
+    { label: "intercept", value: 25 },
+    { label: "bedrooms", value: 16 },
+    { label: "bathrooms", value: 19 },
+    { label: "sqft_living", value: 207 },
+    { label: "sqft_lot", value: 5 },
+    { label: "floors", value: 88 },
   ],
   data: KING_COUNTY_HOUSES_DATA,
 };

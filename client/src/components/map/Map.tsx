@@ -17,7 +17,7 @@ const Map = ({
   viewType: ViewType;
 }) => {
   const [activePoint, setActivePoint] = useState<Point | null>(null);
-  const bandwidth = 300; // hard-coding for now
+  const bandwidth = 289; // hard-coding for now
 
   let data: Point[] = dataset.data;
   switch (viewType) {
