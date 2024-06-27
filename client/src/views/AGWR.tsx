@@ -9,13 +9,19 @@ export type ViewType = "residuals" | "coefficients" | "bandwidths";
 
 const Content = () => {
   const [dataset, setDataset] = useState<Dataset>(NewYorkDataset);
-
   const [models, setModels] = useState<{
     spatial: "SMGWR";
     ml: "Random Forest";
   }>({ spatial: "SMGWR", ml: "Random Forest" });
 
   const [viewType, setViewType] = useState<ViewType>("residuals");
+
+  const [coefficientFeature, setCoefficientFeature] = useState<string>(
+    dataset.bandwidths[0].label
+  );
+  const [bandwidthFeature, setBandwidthFeature] = useState<string>(
+    dataset.bandwidths[0].label
+  );
 
   return (
     <div className="flex flex-col justify-between w-full h-full bg-gray-100 rounded-sm relative">
@@ -27,16 +33,17 @@ const Content = () => {
           buttons={[
             <Button
               label="Dataset"
-              displayValue={dataset.name}
-              onClick={() => {
-                if (dataset.name === "King_County_Houses")
-                  setDataset(NewYorkDataset);
-                else setDataset(KingCountyDataset);
+              selectedOption={dataset.name}
+              onOptionSelected={(value: string) => {
+                if (value === "King_County_Houses")
+                  setDataset(KingCountyDataset);
+                else setDataset(NewYorkDataset);
               }}
+              options={[KingCountyDataset.name, NewYorkDataset.name]}
             />,
             <Button
               label="Models"
-              displayValue={models.spatial + " / " + models.ml}
+              options={[models.spatial + " / " + models.ml]}
             />,
           ]}
         />
@@ -53,11 +60,21 @@ const Content = () => {
               label="Coefficients"
               isSelected={viewType === "coefficients"}
               onClick={() => setViewType("coefficients")}
+              selectedOption={coefficientFeature}
+              options={dataset.bandwidths.map((e) => e.label)}
+              onOptionSelected={(value: string) => {
+                setCoefficientFeature(value);
+              }}
             />,
             <Button
               label="Bandwidths"
               isSelected={viewType === "bandwidths"}
               onClick={() => setViewType("bandwidths")}
+              selectedOption={bandwidthFeature}
+              options={dataset.bandwidths.map((e) => e.label)}
+              onOptionSelected={(value: string) => {
+                setBandwidthFeature(value);
+              }}
             />,
           ]}
         />

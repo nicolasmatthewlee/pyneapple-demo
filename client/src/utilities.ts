@@ -64,7 +64,6 @@ export const getResidualColoring = (allPoints: Point[]) => {
     const darkness = 150 - (255 - 150) * percentOfMax;
 
     let color = "";
-    console.log(min);
     if (p.residual > 0)
       color = `rgba(${darkness},${lightness},${darkness},0.5)`;
     else color = `rgba(${lightness},${darkness},${darkness},0.5)`;
