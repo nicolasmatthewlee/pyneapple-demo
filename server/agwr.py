@@ -8,7 +8,9 @@ import time
 import math
 import multiprocessing
 import pickle
+import json
 
+# 1. select dataset
 kc_filename = "kc_house_sample.csv"
 ny_filename = "ny_airbnb_sample.csv"
 
@@ -22,23 +24,23 @@ except:
 if selection == 1:
     model_filename = "kc_model.pkl"
     prediction_filename = "kc_predictions.csv"
+    features = ["bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors"]
     df = pd.read_csv(kc_filename)
-    x_train = df[["bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors"]].values
+    x_train = df[features].values
     y_train = df["price"].values.reshape(-1, 1)
     coords_train = df[["lat", "long"]].values
 elif selection == 2:
     model_filename = "ny_model.pkl"
     prediction_filename = "ny_predictions.csv"
+    features = [
+        "minimum_nights",
+        "number_of_reviews",
+        "reviews_per_month",
+        "calculated_host_listings_count",
+        "availability_365",
+    ]
     df = pd.read_csv(ny_filename)
-    x_train = df[
-        [
-            "minimum_nights",
-            "number_of_reviews",
-            "reviews_per_month",
-            "calculated_host_listings_count",
-            "availability_365",
-        ]
-    ].values
+    x_train = df[features].values
     y_train = df["price"].values.reshape(-1, 1)
     coords_train = df[["latitude", "longitude"]].values
 
@@ -66,7 +68,7 @@ for rep in range(rep_count):
     sec1 = max(1, math.floor(temp ** (0.5)))
     sec2 = max(1, math.ceil(temp ** (0.5)))
 
-    print("processes:", processes)
+    print("processes:", processes, end="\n\n")
 
     A_GWR_config = {
         "process_count": processes,
@@ -81,9 +83,17 @@ for rep in range(rep_count):
 
     end_time = time.time()
 
-    # print bandwidths
+    # save bandwidths
     # NOTE: the first bandwidth is for the intercept
-    print("bandwidths:", A_GWR.spatial_learners[0].bandwidths)
+    features.insert(0, "intercept")
+    bandwidths = [
+        {"label": feature, "value": value}
+        for feature, value in zip(features, A_GWR.spatial_learners[0].bandwidths)
+    ]
+    filename = "parameters.txt"
+    with open(filename, "w") as file:
+        file.write(f"bandwidths:{json.dumps(bandwidths, indent=2)},")
+        print(f'Bandwidths saved to "{filename}"')
 
     # save model
     with open(model_filename, "wb") as file:

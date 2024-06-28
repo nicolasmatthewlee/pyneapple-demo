@@ -58,22 +58,21 @@ for package in pip_packages:
 	subprocess.run(["pip", "install", package])
 ```
 
-_to fix error installing `mpi4py` run the following_
+4. in `/AGWR/SMGWR/SMGWRModel.py` add statement to write coefficients
 
-```shell
-brew install mpich
-pip install mpi4py
+```python
+# in SMGWRModel.predict right before the return
+...
+import pickle
+filename = "coefficients.pkl"
+with open(filename, "wb") as file:
+    pickle.dump(coefficients, file)
+    print(f'Coefficients saved to "{filename}"')
+...
 ```
 
-4. run `example.py` (or your own script) in `/AGWR`
+5. move `agwr.py` and `agwr.ipynb` to `/AGWR` and run
 
 ```shell
-python example.py
-```
-
-_to fix incompatible architecture error with `dlopen` on macOS, run the following_
-
-```shell
-pip uninstall ConfigSpace
-pip install ConfigSpace
+python agwr.py
 ```
