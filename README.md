@@ -64,7 +64,9 @@ for package in pip_packages:
 # in SMGWRModel.predict right before the return
 ...
 import pickle
-filename = "coefficients.pkl"
+import time
+
+filename = f"trained_models/coefficients_{time.time()}.pkl"
 with open(filename, "wb") as file:
     pickle.dump(coefficients, file)
     print(f'Coefficients saved to "{filename}"')

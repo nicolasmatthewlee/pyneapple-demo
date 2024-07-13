@@ -1,110 +1,127 @@
 import pandas as pd
-from helpers.SampleModules.SpatialModules import smgwr_module
-from helpers.SampleModules.MLModules import random_forrest
-
-from ModularFramework.ModularFramework import ModularFramework
 import utils as utils
 import time
-import math
-import multiprocessing
 import pickle
 import json
+import itertools
+import os
+import numpy as np
 
-# 1. select dataset
-kc_filename = "kc_house_sample.csv"
-ny_filename = "ny_airbnb_sample.csv"
+from helpers.SampleModules.SpatialModules import smgwr_module
+from helpers.SampleModules.MLModules import random_forrest
+from helpers.SampleModules.SpatialModules import mgwr_module, smgwr_module
+from helpers.SampleModules.MLModules import random_forrest, neural_network, xgb
+from ModularFramework.ModularFramework import ModularFramework
 
-print(f"[1] {kc_filename}\n[2] {ny_filename}")
 
-try:
-    selection = int(input("choose a dataset: "))
-except:
-    raise Exception("You must choose an available dataset.")
+# JSON encoder (for bandwidths)
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NumpyEncoder, self).default(obj)
 
-if selection == 1:
-    model_filename = "kc_model.pkl"
-    prediction_filename = "kc_predictions.csv"
-    features = ["bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors"]
-    df = pd.read_csv(kc_filename)
-    x_train = df[features].values
-    y_train = df["price"].values.reshape(-1, 1)
-    coords_train = df[["lat", "long"]].values
-elif selection == 2:
-    model_filename = "ny_model.pkl"
-    prediction_filename = "ny_predictions.csv"
-    features = [
+
+kc = {
+    "name": "kc",
+    "filename": "kc_house_sample.csv",
+    "x": ["bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors"],
+    "y": "price",
+    "coords": ["latitude", "longitude"],
+}
+ny = {
+    "name": "ny",
+    "filename": "ny_airbnb_sample.csv",
+    "x": [
         "minimum_nights",
         "number_of_reviews",
         "reviews_per_month",
-        "calculated_host_listings_count",
+        "host_listings_count",
         "availability_365",
-    ]
-    df = pd.read_csv(ny_filename)
-    x_train = df[features].values
-    y_train = df["price"].values.reshape(-1, 1)
-    coords_train = df[["latitude", "longitude"]].values
+    ],
+    "y": "price",
+    "coords": ["latitude", "longitude"],
+}
+data_all = [kc, ny]
 
+modules_all_spatial = [
+    {"name": "mgwr", "module": mgwr_module},
+    {"name": "smgwr", "module": smgwr_module},
+]
+modules_all_ml = [
+    {"name": "random_forest", "module": random_forrest},
+    {"name": "neural_network", "module": neural_network},
+    {"name": "xgb", "module": xgb},
+]
+modules_all = list(itertools.product(modules_all_spatial, modules_all_ml))
 
-# 2. define spatial, ml models
-spatial_module, ML_module = smgwr_module, random_forrest
+# 1. create directory for trained models
+directory_name = "trained_models"
+try:
+    os.mkdir(directory_name)
+except FileExistsError:
+    pass
 
-# 3. train random forest
-nn = ML_module(x_train, coords_train, y_train)
+# 2. run AGWR on each spatial/ml/data combination
+i = 0
+for spatial, ml in modules_all:
+    for data in data_all:
+        print(f'[{i}] {spatial["name"]}_{ml["name"]}_{data["name"]}')
+        i += 1
+        # 2.1 read data
+        df = pd.read_csv(data["filename"])
+        x_train = df[data["x"]].values
+        y_train = df[data["y"]].values.reshape(-1, 1)
+        coords_train = df[data["coords"]].values
 
-# 4. train spatial model
-mean_time = 0
-mean_res = 0
-rep_count = 1
-for rep in range(rep_count):
-    start_time = time.time()
+        # 2.2 train ml module
+        spatial_module, ml_module = spatial["module"], ml["module"]
+        ml_module_trained = ml_module(x_train, coords_train, y_train)
 
-    # selecting spatial and ml modules
-    spatial_module, ML_module = smgwr_module, random_forrest
+        # 2.3 train spatial module
+        start_time = time.time()
+        config = {
+            "process_count": 1,
+            "divide_method": "equalCount",
+            "divide_sections": [1, 1],
+            "pipelined": False,
+        }
+        agwr = ModularFramework(spatial_module, ml_module, config)
+        agwr.train(x_train, coords_train, y_train)
 
-    # creating the A-GWR setting
-    temp = len(x_train)
-    temp /= 1092
-    processes = min(multiprocessing.cpu_count(), math.ceil(temp))
-    sec1 = max(1, math.floor(temp ** (0.5)))
-    sec2 = max(1, math.ceil(temp ** (0.5)))
+        # 2.4 save bandwidths
+        # NOTE: the first bandwidth is for the intercept
+        features = data["x"].copy()
+        features.insert(0, "intercept")
+        bandwidths = [
+            {"label": feature, "value": value}
+            for feature, value in zip(features, agwr.spatial_learners[0].bandwidths)
+        ]
+        filename = f'{directory_name}/{spatial["name"]}_{ml["name"]}_{data["name"]}_parameters.txt'
+        with open(filename, "w") as file:
+            file.write(
+                f"bandwidths:{json.dumps(bandwidths,cls=NumpyEncoder, indent=2)},"
+            )
+            print(f'Bandwidths saved to "{filename}"')
 
-    print("processes:", processes, end="\n\n")
+        # 2.5 save model
+        filename = (
+            f'{directory_name}/{spatial["name"]}_{ml["name"]}_{data["name"]}_model.pkl'
+        )
+        with open(filename, "wb") as file:
+            pickle.dump(agwr, file)
+            print(f'Model saved to "{filename}"')
 
-    A_GWR_config = {
-        "process_count": processes,
-        "divide_method": "equalCount",
-        "divide_sections": [sec1, sec2],
-        "pipelined": False,
-    }  # a-gwr configurations
-    A_GWR = ModularFramework(spatial_module, ML_module, A_GWR_config)
+        # 2.6 save predictions
+        filename = f'{directory_name}/{spatial["name"]}_{ml["name"]}_{data["name"]}_predictions.csv'
+        pred = agwr.predict(x_train, coords_train, y_train)
+        df = pd.DataFrame(pred, columns=["predicted"])
+        df.to_csv(filename, index=False)
+        print(f'Predictions saved to "{filename}"')
 
-    # train model
-    A_GWR.train(x_train, coords_train, y_train)
-
-    end_time = time.time()
-
-    # save bandwidths
-    # NOTE: the first bandwidth is for the intercept
-    features.insert(0, "intercept")
-    bandwidths = [
-        {"label": feature, "value": value}
-        for feature, value in zip(features, A_GWR.spatial_learners[0].bandwidths)
-    ]
-    filename = "parameters.txt"
-    with open(filename, "w") as file:
-        file.write(f"bandwidths:{json.dumps(bandwidths, indent=2)},")
-        print(f'Bandwidths saved to "{filename}"')
-
-    # save model
-    with open(model_filename, "wb") as file:
-        pickle.dump(A_GWR, file)
-        print(f'Model saved to "{model_filename}"')
-
-    # save predictions to csv
-    pred = A_GWR.predict(x_train, coords_train, y_train)
-    df = pd.DataFrame(pred, columns=["predicted"])
-    df.to_csv(prediction_filename, index=False)
-    print(f'Predictions saved to "{prediction_filename}"')
-
-
-print("\n", mean_time / rep_count, mean_res / rep_count)
+        end_time = time.time()
+        print(f"{end_time-start_time:.2f}s\n")
