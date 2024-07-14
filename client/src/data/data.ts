@@ -6,7 +6,7 @@ export type Point = {
   longitude: number;
   actual: number;
   predicted: number;
-  coefficients: number[];
+  coefficients: {};
 };
 
 export type Dataset = {

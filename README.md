@@ -78,3 +78,5 @@ with open(filename, "wb") as file:
 ```shell
 python agwr.py
 ```
+
+6. run post-processing in `agwr.ipynb` and move all `.ts` files into `client/src/data`

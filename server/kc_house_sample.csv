@@ -1,4 +1,4 @@
-,lat,long,price,bedrooms,bathrooms,sqft_living,sqft_lot,floors
+,latitude,longitude,price,bedrooms,bathrooms,sqft_living,sqft_lot,floors
 27,47.6221,-122.314,667000,3,1,1400,1581,1.5
 64,47.6113,-122.297,425000,3,2.25,1660,6000,1
 99,47.6415,-122.315,850830,3,2.5,2070,13241,1.5
