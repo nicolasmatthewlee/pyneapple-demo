@@ -80,3 +80,10 @@ python agwr.py
 ```
 
 6. run post-processing in `agwr.ipynb` and move all `.ts` files into `client/src/data`
+
+# resources
+
+- [NY_Airbnb](https://www.kaggle.com/datasets/dgomonov/new-york-city-airbnb-open-data)
+- [King_County](https://www.kaggle.com/datasets/harlfoxem/housesalesprediction)
+- Pyneapple [source code](https://github.com/MagdyLab/Pyneapple)
+- AGWR [source code](https://github.com/mshahneh/AGWR)
