@@ -12,12 +12,18 @@ import { ViewType } from "views/AGWR";
 const Map = ({
   dataset,
   viewType,
+  feature,
 }: {
   dataset: Dataset;
   viewType: ViewType;
+  feature: string;
 }) => {
   const [activePoint, setActivePoint] = useState<Point | null>(null);
-  const bandwidth = 280; // hard-coding for now
+  const bandwithValue = dataset.bandwidths.find((e) => e.label === feature) as {
+    label: string;
+    value: number;
+  };
+  const bandwidth = bandwithValue.value;
 
   let data: Point[] = dataset.data;
   switch (viewType) {
@@ -25,11 +31,16 @@ const Map = ({
       data = getResidualColoring(dataset.data);
       break;
     case "coefficients":
+      const featureIndex = dataset.bandwidths.findIndex(
+        (item) => item.label === feature
+      );
       data = getCoefficientColoring(
         dataset.data,
         dataset.coefficientMins,
         dataset.coefficientMeds,
-        dataset.coefficientMaxes
+        dataset.coefficientMaxes,
+        featureIndex,
+        feature
       );
       break;
     case "bandwidths":

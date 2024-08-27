@@ -11,7 +11,6 @@ const CustomMarker = ({
     actual: number;
     predicted: number;
     color?: string;
-    coefficients: number[];
   };
   onClick?: Function;
 }) => {

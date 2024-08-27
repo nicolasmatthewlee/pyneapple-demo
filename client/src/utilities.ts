@@ -104,25 +104,27 @@ export const getCoefficientColoring = (
   allPoints: Point[],
   coefficientMins: number[],
   coefficientMeds: number[],
-  coefficientMaxes: number[]
+  coefficientMaxes: number[],
+  i: number, // the index in the coefficient arrays corresponding to the current feature
+  feature: string
 ) => {
   return allPoints.map((p) => {
-    const i = 2; // placeholder for now
     let color = "";
 
     let percentOfMax = 0;
-    if (p.coefficients[i] > coefficientMeds[i]) {
+    if (p.coefficients[feature] > coefficientMeds[i]) {
       const maxDiff = coefficientMaxes[i] - coefficientMeds[i];
-      percentOfMax = (p.coefficients[i] - coefficientMeds[i]) / maxDiff;
+      percentOfMax = (p.coefficients[feature] - coefficientMeds[i]) / maxDiff;
     } else {
       const maxDiff = coefficientMeds[i] - coefficientMins[i];
-      percentOfMax = Math.abs(p.coefficients[i] - coefficientMeds[i]) / maxDiff;
+      percentOfMax =
+        Math.abs(p.coefficients[feature] - coefficientMeds[i]) / maxDiff;
     }
 
     const lightness = 150 + (255 - 150) * Math.max(percentOfMax, 0);
     const darkness = 150 - (255 - 150) * Math.max(percentOfMax, 0);
 
-    if (p.coefficients[i] > coefficientMeds[i]) {
+    if (p.coefficients[feature] > coefficientMeds[i]) {
       color = `rgba(${lightness},${darkness},${lightness},0.5)`;
     } else color = `rgba(${darkness},${lightness},${lightness},0.5)`;
     return {

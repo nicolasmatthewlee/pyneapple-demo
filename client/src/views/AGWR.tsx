@@ -2,48 +2,75 @@ import AppLayout from "components/AppLayout";
 import ButtonContainerHorizontal from "components/button/ButtonContainerHorizontal";
 import Button from "components/button/Button";
 import Map from "components/map/Map";
-import { useState } from "react";
-import { NewYorkDataset, KingCountyDataset, Dataset } from "data/data";
+import { useEffect, useState } from "react";
+import {
+  Dataset,
+  DatasetOption,
+  ModelOption,
+  MODEL_OPTIONS,
+  DATASET_OPTIONS,
+  MODEL_DATA_ALL,
+} from "data/data";
 
 export type ViewType = "residuals" | "coefficients" | "bandwidths";
 
 const Content = () => {
-  const [dataset, setDataset] = useState<Dataset>(NewYorkDataset);
-  const [models, setModels] = useState<{
-    spatial: "SMGWR";
-    ml: "Random Forest";
-  }>({ spatial: "SMGWR", ml: "Random Forest" });
-
+  const [selectedDataset, setSelectedDataset] = useState<DatasetOption>(
+    DATASET_OPTIONS[0]
+  );
+  const [selectedModel, setSelectedModel] = useState<ModelOption>(
+    MODEL_OPTIONS[0]
+  );
+  const [modelData, setModelData] = useState<Dataset>(MODEL_DATA_ALL[0]);
   const [viewType, setViewType] = useState<ViewType>("residuals");
+  const [coefficientFeature, setCoefficientFeature] =
+    useState<string>("intercept");
+  const [bandwidthFeature, setBandwidthFeature] = useState<string>("intercept");
 
-  const [coefficientFeature, setCoefficientFeature] = useState<string>(
-    dataset.bandwidths[0].label
-  );
-  const [bandwidthFeature, setBandwidthFeature] = useState<string>(
-    dataset.bandwidths[0].label
-  );
+  useEffect(() => {
+    const modelData = MODEL_DATA_ALL.find(
+      (e) => e.name === selectedModel.value + "_" + selectedDataset.value
+    ) as Dataset;
+    setModelData(modelData);
+    setCoefficientFeature("intercept");
+    setBandwidthFeature("intercept");
+  }, [selectedDataset, selectedModel]);
 
   return (
     <div className="flex flex-col justify-between w-full h-full bg-gray-100 rounded-sm relative">
       <div className="z-0 w-full h-full">
-        <Map dataset={dataset} viewType={viewType} />
+        <Map
+          dataset={modelData}
+          viewType={viewType}
+          feature={
+            viewType === "bandwidths" ? bandwidthFeature : coefficientFeature
+          }
+        />
       </div>
       <div className="py-[15px] absolute z-10 w-full top-0 pointer-events-none">
         <ButtonContainerHorizontal
           buttons={[
             <Button
               label="Dataset"
-              selectedOption={dataset.name}
+              selectedOption={selectedDataset.label}
               onOptionSelected={(value: string) => {
-                if (value === "King_County_Houses")
-                  setDataset(KingCountyDataset);
-                else setDataset(NewYorkDataset);
+                const selected: ModelOption = DATASET_OPTIONS.find(
+                  (e) => e.label === value
+                ) as ModelOption;
+                setSelectedDataset(selected);
               }}
-              options={[KingCountyDataset.name, NewYorkDataset.name]}
+              options={DATASET_OPTIONS.map((e) => e.label)}
             />,
             <Button
               label="Models"
-              options={[models.spatial + " / " + models.ml]}
+              selectedOption={selectedModel.label}
+              onOptionSelected={(value: string) => {
+                const selected: ModelOption = MODEL_OPTIONS.find(
+                  (e) => e.label === value
+                ) as ModelOption;
+                setSelectedModel(selected);
+              }}
+              options={MODEL_OPTIONS.map((e) => e.label)}
             />,
           ]}
         />
@@ -61,7 +88,7 @@ const Content = () => {
               isSelected={viewType === "coefficients"}
               onClick={() => setViewType("coefficients")}
               selectedOption={coefficientFeature}
-              options={dataset.bandwidths.map((e) => e.label)}
+              options={modelData.bandwidths.map((e) => e.label)}
               onOptionSelected={(value: string) => {
                 setCoefficientFeature(value);
               }}
@@ -71,7 +98,7 @@ const Content = () => {
               isSelected={viewType === "bandwidths"}
               onClick={() => setViewType("bandwidths")}
               selectedOption={bandwidthFeature}
-              options={dataset.bandwidths.map((e) => e.label)}
+              options={modelData.bandwidths.map((e) => e.label)}
               onOptionSelected={(value: string) => {
                 setBandwidthFeature(value);
               }}

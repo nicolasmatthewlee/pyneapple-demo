@@ -20,7 +20,7 @@ const Navigation = () => {
       </div>
       {/* navigation */}
       <div className="flex flex-1 justify-end">
-        <NavigationItem label="Home" url="/" />
+        <NavigationItem label="Home" />
         <NavigationItem label="Pyneapple-R" />
         <NavigationItem label="Pyneapple-G" />
         <NavigationItem
